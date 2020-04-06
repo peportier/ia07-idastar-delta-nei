@@ -117,7 +117,7 @@ addNeighbor( State &currentState, Move &move,
   {
     neighbors.push_back( make_pair( move, h(currentState) ) );
   }
-  doMove( currentState, move );
+  doMove( currentState, move ); // undo move
 }
 
 void
@@ -199,7 +199,7 @@ search( State& currentState,
       path.push_back( currentState );
       search( currentState, ub, nub, path, bestPath, h, nbVisitedState );
       path.pop_back();
-      doMove( currentState, p.first );
+      doMove( currentState, p.first ); // undo move
       if( !bestPath.empty() ) return;
     }
   }
@@ -235,19 +235,22 @@ main()
   //State b = {10,0,2,4,5,1,6,12,11,13,9,7,15,3,14,8}; // 33 -> 59
   //State b = {14,1,9,6,4,8,12,5,7,2,3,0,10,11,13,15}; // 35 -> 45
   //State b = {7,11,8,3,14,0,6,15,1,4,13,9,5,12,2,10}; // C1 36 -> 46
-  State b = {14,10,9,4,13,6,5,8,2,12,7,0,1,3,11,15}; // C2 43 -> 59
-  //State b = {4,8,3,2,0,7,6,5,1}; //C0
+  //State b = {14,10,9,4,13,6,5,8,2,12,7,0,1,3,11,15}; // C2 43 -> 59
+  State b = {4,8,3,2,0,7,6,5,1}; //C0
   //State b = {3,2,5,4,1,8,6,7,0};
+  //State b = {1,0,3,4,2,6,7,5,8};
   list<State> bestPath;
   int nbVisitedState = 0;
   
   auto start = std::chrono::high_resolution_clock::now();
-  ida( b, manh, bestPath, nbVisitedState );
+  ida( b, nbmis, bestPath, nbVisitedState );
   auto finish = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = finish - start;
   cout << "Elapsed time: " << elapsed.count() << " s\n";
   cout << "nb moves: " << bestPath.size()-1 << endl;
   cout << "nb visited states: " << nbVisitedState << endl;
+
+  for( const State& s : bestPath ) print(s);
   
   return 0;
 }
